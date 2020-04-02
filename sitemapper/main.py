@@ -22,7 +22,7 @@ crawler = UrlCrawler(exclude=args.exclude, url=url)
 
 # Start crawling
 
-crawler.crawl(url, crawler.uri)
+crawler.crawl(url)
 
 
 # XML tree building

@@ -6,10 +6,10 @@ from urllib.parse import urlparse
 class UrlCrawler(object):
     def __init__(self, url, exclude=None):
         self.visited = {}
-        self.visited[url] = url
+        self.visited[url] = 1
         self.exclude = exclude
         self.uri = self.get_parsed_uri(url)
-        self.crawl(url, self.uri)
+        self.crawl(url)
 
 
 # Crawls website & returns dictionary (key=url, value=1)
@@ -20,9 +20,8 @@ class UrlCrawler(object):
         
         for a in soup.find_all('a', href=True):
             link = self.get_absolute_url(a['href'])
-            if self.filter_url(link):
+            if self.url_is_valid(link):
                 self.add_url(link)
-                print(self.visited[link])
                 new_url = link
                 try:
                     self.crawl(new_url)
@@ -31,11 +30,11 @@ class UrlCrawler(object):
 
 
 # Checks the following contitions:
-# 1: if url has already been visited 
-# 2: if url belongs to the original crawled website
-# 3: if url has excluded regex patterns
+# 1: if url has already been visited: returns False
+# 2: if url doesn't belong to the original crawled website: returns False
+# 3: if url has excluded regex patterns: returns False
 
-    def filter_url(self, url: str) -> bool:
+    def url_is_valid(self, url: str) -> bool:
         if self.visited.get(url):
             return False
         if self.uri not in url:
@@ -47,7 +46,7 @@ class UrlCrawler(object):
             return True
 
 
-# Returns absolute url if relative given
+# Returns absolute url if relative one given
 
     def get_absolute_url(self, url: str) -> str:
         if self.uri not in url:
