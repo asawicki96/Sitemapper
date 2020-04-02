@@ -11,24 +11,31 @@ class UrlCrawler(object):
         self.uri = self.get_parsed_uri(url)
         self.crawl(url, self.uri)
 
-        
-    def crawl(self, url, uri):
+
+# Crawls website & returns dictionary (key=url, value=1)
+
+    def crawl(self, url: str) -> dict:
         response = requests.get(url)
         soup = BeautifulSoup(response.text, features="html.parser") 
-        print(len(self.visited))
         
-        for a in soup.find_all('a'):
+        for a in soup.find_all('a', href=True):
             link = self.get_absolute_url(a['href'])
             if self.filter_url(link):
                 self.add_url(link)
                 print(self.visited[link])
                 new_url = link
                 try:
-                    self.crawl(new_url, uri)
+                    self.crawl(new_url)
                 except:
                     pass
 
-    def filter_url(self, url):
+
+# Checks the following contitions:
+# 1: if url has already been visited 
+# 2: if url belongs to the original crawled website
+# 3: if url has excluded regex patterns
+
+    def filter_url(self, url: str) -> bool:
         if self.visited.get(url):
             return False
         if self.uri not in url:
@@ -39,7 +46,10 @@ class UrlCrawler(object):
         else:
             return True
 
-    def get_absolute_url(self, url):
+
+# Returns absolute url if relative given
+
+    def get_absolute_url(self, url: str) -> str:
         if self.uri not in url:
             if 'http' not in url and 'https' not in url  and "." not in url:
                 link = self.uri + url
@@ -49,11 +59,16 @@ class UrlCrawler(object):
             link = url
         return link
 
-    def add_url(self, url):
-        self.visited[url] = url
+
+# Adds url to dictionary
+
+    def add_url(self, url: str) -> None:
+        self.visited[url] = 1
 
 
-    def get_parsed_uri(self, url):
+# Returns uri when url given 
+
+    def get_parsed_uri(self, url: str) -> str:
         parsed_uri = urlparse(url)
         result = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
         return result
