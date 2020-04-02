@@ -22,11 +22,12 @@ class UrlCrawler(object):
             link = self.get_absolute_url(a['href'])
             if self.url_is_valid(link):
                 self.add_url(link)
+                
                 new_url = link
                 try:
                     self.crawl(new_url)
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
 
 
 # Checks the following contitions:
